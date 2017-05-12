@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from pysoundcard import Stream
-from soundfile import blocks
 from webrtcvad import Vad
 
 from itertools import cycle
