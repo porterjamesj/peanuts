@@ -6,11 +6,11 @@ from pysoundcard import Stream
 """Play an audio file."""
 
 fs, wave = wavread(sys.argv[1])
-wave = np.array(wave, dtype=np.float64)
-wave /= 2**15 # normalize -max_int16..max_int16 to -1..1
+wave = np.array(wave, dtype=np.int16)
 
-blocksize = 1024
-s = Stream(samplerate=fs, blocksize=blocksize)
+blocksize = 256
+s = Stream(samplerate=fs, blocksize=blocksize, dtype='int16')
 s.start()
-s.write(wave)
+while True:
+    s.write(wave[0:(1024*100)])
 s.stop()
