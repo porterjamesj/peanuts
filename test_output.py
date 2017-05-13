@@ -6,7 +6,6 @@ from pysoundcard import Stream
 """Play an audio file."""
 
 fs, wave = wavread(sys.argv[1])
-print(fs)
 wave = np.array(wave, dtype=np.int16)
 
 blocksize = 256
