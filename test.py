@@ -16,8 +16,8 @@ HOP_SIZE = SAMPLE_RATE / 100  # this is the number of frames in 10 ms
 BLOCK_SIZE = 1024  # TODO hmmmm
 
 # onset params TODO tweak a lot
-LAG_TIME = 7  # in ms
-NECESSARY_FRACTION = 0.5
+LAG_TIME = 5  # in ms
+NECESSARY_FRACTION = 0.3
 
 
 def open_wav(name="teacher_441.wav"):
@@ -35,7 +35,7 @@ class VoiceOver(object):
 
     def __init__(self):
         self.input_buf = np.empty((BLOCK_SIZE, 1), dtype=np.int16)
-        self.vad = Vad(3)
+        self.vad = Vad(2)
         self.vad_q = deque([False], LAG_TIME)
         self.output = cycle(open_wav())
 
@@ -50,9 +50,9 @@ class VoiceOver(object):
         if len(self.input_buf) > HOP_SIZE:  # we can pass data to vad
             ten_ms, rest = (self.input_buf[0:HOP_SIZE],
                             self.input_buf[HOP_SIZE:])
-            # import pdb; pdb.set_trace()
+            resampled_to_32k = resample(ten_ms, 320, axis=0).astype(np.int16).tostring()
             self.vad_q.append(
-                self.vad.is_speech(ten_ms[0:320].tostring(), 32000)
+                self.vad.is_speech(resampled_to_32k, 32000)
             )
             self.input_buf = rest
         if self.input_is_talking():
