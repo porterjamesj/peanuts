@@ -12,7 +12,7 @@ from itertools import cycle, islice
 
 
 SAMPLE_RATE = 44100
-HOP_SIZE = SAMPLE_RATE / 100  # this is the number of frames in 10 ms
+HOP_SIZE = 3*(SAMPLE_RATE / 100)  # this is the number of frames in 10 ms
 BLOCK_SIZE = 1024  # TODO hmmmm
 
 # onset params TODO tweak a lot
@@ -50,7 +50,7 @@ class VoiceOver(object):
         if len(self.input_buf) > HOP_SIZE:  # we can pass data to vad
             ten_ms, rest = (self.input_buf[0:HOP_SIZE],
                             self.input_buf[HOP_SIZE:])
-            resampled_to_32k = resample(ten_ms, 320, axis=0).astype(np.int16).tostring()
+            resampled_to_32k = resample(ten_ms, 3*320, axis=0).astype(np.int16).tostring()
             self.vad_q.append(
                 self.vad.is_speech(resampled_to_32k, 32000)
             )
