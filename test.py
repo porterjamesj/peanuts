@@ -3,6 +3,7 @@
 from pysoundcard import Stream, continue_flag
 from webrtcvad import Vad
 from scipy.io.wavfile import read as wavread
+from scipy.signal import resample
 import numpy as np
 
 import time
@@ -10,18 +11,18 @@ from collections import deque
 from itertools import cycle, islice
 
 
-SAMPLE_RATE = 32000
-HOP_SIZE = 3*(SAMPLE_RATE / 100)  # this is the number of frames in 10 ms
-BLOCK_SIZE = 256  # TODO hmmmm
+SAMPLE_RATE = 44100
+HOP_SIZE = SAMPLE_RATE / 100  # this is the number of frames in 10 ms
+BLOCK_SIZE = 1024  # TODO hmmmm
 
 # onset params TODO tweak a lot
 LAG_TIME = 7  # in ms
 NECESSARY_FRACTION = 0.5
 
 
-def open_wav(name="teacher.wav"):
+def open_wav(name="teacher_441.wav"):
     sr, wave = wavread(name)
-    assert sr == SAMPLE_RATE
+    assert sr == 44100
     wav = np.array(wave, dtype=np.int16)
     wav = (wav[:, 0:1] + wav[:, 1:2]) / 2  # stereo -> mono
     return wav
@@ -49,8 +50,9 @@ class VoiceOver(object):
         if len(self.input_buf) > HOP_SIZE:  # we can pass data to vad
             ten_ms, rest = (self.input_buf[0:HOP_SIZE],
                             self.input_buf[HOP_SIZE:])
+            # import pdb; pdb.set_trace()
             self.vad_q.append(
-                self.vad.is_speech(ten_ms.tostring(), SAMPLE_RATE)
+                self.vad.is_speech(ten_ms[0:320].tostring(), 32000)
             )
             self.input_buf = rest
         if self.input_is_talking():
@@ -66,7 +68,7 @@ def main():
         blocksize=BLOCK_SIZE,
         channels=1,
         dtype='int16',
-        samplerate=SAMPLE_RATE,
+        samplerate=44100,
         callback=vo.callback,
     )
     soundcard.start()
