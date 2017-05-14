@@ -16,7 +16,7 @@ HOP_SIZE = 3*(SAMPLE_RATE / 100)  # this is the number of frames in 10 ms
 BLOCK_SIZE = 1024  # TODO hmmmm
 
 # onset params TODO tweak a lot
-LAG_TIME = 5  # in ms
+LAG_TIME = 7  # in ms
 NECESSARY_FRACTION = 0.3
 
 
